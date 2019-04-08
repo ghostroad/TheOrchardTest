@@ -8,6 +8,11 @@ class TestingConfig(object):
     SQLALCHEMY_TRACK_MODIFICATIONS = False    
     TESTING = True
     SQLALCHEMY_DATABASE_URI = "postgresql://localhost/theorchard_test"
+    
+def reset_db():    
+    db.session.rollback()
+    db.session.execute("TRUNCATE TABLE establishment CASCADE")
+    db.session.commit()
 
 @pytest.fixture(scope="session")
 def test_app():
@@ -22,6 +27,5 @@ def test_app():
     
 @pytest.fixture
 def test_db(test_app):
-    db.session.execute("TRUNCATE TABLE establishment CASCADE")
-    db.session.commit()
-    yield db
+    reset_db()
+    return db.session
