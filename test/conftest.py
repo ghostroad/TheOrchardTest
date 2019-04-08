@@ -17,15 +17,17 @@ def reset_db():
 @pytest.fixture(scope="session")
 def test_app():
     app = create_app(TestingConfig)
-    ctx = app.app_context()
-    ctx.push()
+    context = app.app_context()
+    context.push()
     db.create_all()
     
     yield app
     
-    ctx.pop()
+    context.pop()
     
 @pytest.fixture
-def test_db(test_app):
+def test_db(test_app): 
+    # Even though the method parameter is unused, requiring it initializes the test app,
+    # which must be done prior to any db operation.
     reset_db()
     return db.session

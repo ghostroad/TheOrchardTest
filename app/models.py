@@ -16,10 +16,12 @@ class Establishment(db.Model):
         return '<Establishment - camis: {}, name: {}>'.format(self.camis, self.dba)
         
 class Rating(db.Model):
+    
     id = db.Column(db.Integer, primary_key=True)
     grade = db.Column(ENUM("A", "B", "C", name="grade", create_type=False), nullable=False)
     date = db.Column(db.Date, nullable=False)
     camis = db.Column(db.Integer, db.ForeignKey('establishment.camis'), nullable=False)
+    __table_args__ = (db.UniqueConstraint('camis', 'date'),)
     
     def __repr__(self):
         return '<Rating - camis: {}, date: {}, grade: {}>'.format(self.camis, self.date, self.grade)

@@ -14,6 +14,6 @@ def test_creation(test_db):
     rating = ratings[0]
     assert(rating.establishment == establishment)
     assert(rating.grade == "A")
-        
+            
     
     
