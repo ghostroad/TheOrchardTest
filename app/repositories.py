@@ -14,3 +14,6 @@ class EstablishmentRepository(object):
     def save(self, *establishments):
         self.db.add_all(establishments)
         self.db.commit()
+        
+    def find(self, camis):
+        return Establishment.query.get(camis)

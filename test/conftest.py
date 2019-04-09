@@ -9,7 +9,7 @@ class TestingConfig(object):
     SQLALCHEMY_TRACK_MODIFICATIONS = False    
     TESTING = True
     SQLALCHEMY_DATABASE_URI = "postgresql://localhost/theorchard_test"
-    SQLALCHEMY_ECHO = True
+    # SQLALCHEMY_ECHO = True
     
 def reset_db():    
     db.session.rollback() # needed in case the session is in a bad state
@@ -27,6 +27,11 @@ def test_app():
     yield app
     
     context.pop()
+    
+@pytest.fixture(scope="session")
+def test_client(test_app):
+    return test_app.test_client()
+        
     
 @pytest.fixture
 def test_db(test_app): 
