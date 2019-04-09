@@ -2,9 +2,11 @@ from flask import Flask
 from config import DevelopmentConfig
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
-from sietsema.blueprints import write_api
 
 db = SQLAlchemy()
+
+from sietsema.blueprints import write_api
+
 
 def create_app(test_config = None):
     app = Flask(__name__, instance_relative_config=True)
