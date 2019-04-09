@@ -1,11 +1,11 @@
 import pytest
 from app.models import Establishment, Rating, LatestRating
-from sqlalchemy import exc, or_, orm, text
+from sqlalchemy import exc, or_
 from datetime import date
+from app.repositories import EstablishmentRepository
 
-def test_creation(test_db):
-    test_db.add(Establishment(camis=1234, dba="Brasserie Beaubien", ratings = [Rating(grade="A", date="01/02/19")]))
-    test_db.commit()
+def test_creation(repo):
+    repo.save(Establishment(camis=1234, dba="Brasserie Beaubien", ratings = [Rating(grade="A", date="01/02/19")]))
     
     ratings = Rating.query.all()
     assert(len(ratings) == 1)
@@ -14,20 +14,18 @@ def test_creation(test_db):
     assert(rating.grade == "A")
             
     
-def test_latest_rating(test_db):        
-    unrated = Establishment(camis=3456, dba="Pho Lien")
-    rated = Establishment(camis=1234, dba="Brasserie Beaubien", ratings=[
+def test_latest_rating(repo):        
+    repo.save(Establishment(camis=3456, dba="Pho Lien"))
+    repo.save(Establishment(camis=1234, dba="Brasserie Beaubien", ratings=[
         Rating(grade="A", date="01/02/19"), 
         Rating(grade="B", date="03/02/19"), 
         Rating(grade="C", date="02/02/19")
-    ])
-    test_db.add_all([unrated, rated])
-    test_db.commit()
+    ]))
 
     assert(Establishment.query.get(1234).latest_rating.grade=="B")
     assert(Establishment.query.get(3456).latest_rating is None)
     
-def test_filtering_by_latest_rating(test_db):
+def test_filtering_by_latest_rating(repo):
     poor = Establishment(camis=3456, dba="Pho Lien", ratings=[
         Rating(grade="B", date="01/15/18"),
         Rating(grade="C", date="06/15/18"),
@@ -44,10 +42,9 @@ def test_filtering_by_latest_rating(test_db):
         Rating(grade="C", date="02/02/19")
     ])
 
-    test_db.add_all([poor, okay, excellent])
-    test_db.commit()
+    repo.save(poor, okay, excellent)
 
-    okay_establishments = Establishment.query.join(Establishment.latest_rating).options(orm.contains_eager(Establishment.latest_rating, alias=LatestRating)).filter(
+    okay_establishments = repo.latest_ratings_query().filter(
         or_(Establishment.cuisine == "French", LatestRating.grade=="B", LatestRating.grade=="A")
     ).all()
 

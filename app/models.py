@@ -3,7 +3,7 @@ from sqlalchemy.dialects.postgresql import ENUM
 
 class Establishment(db.Model):
     camis = db.Column(db.Integer, primary_key=True)
-    dba = db.Column(db.String())
+    dba = db.Column(db.String(), nullable=False)
     boro = db.Column(db.String())
     building = db.Column(db.String())
     street = db.Column(db.String())
