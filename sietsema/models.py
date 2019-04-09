@@ -9,6 +9,7 @@ class Establishment(db.Model):
     street = db.Column(db.String())
     zipcode = db.Column(db.String())
     phone = db.Column(db.String())
+    inspection_date = db.Column(db.Date)
     cuisine = db.Column(db.String(), index=True)
     ratings = db.relationship('Rating', lazy='dynamic')
     
