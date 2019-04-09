@@ -19,6 +19,7 @@ def test_app():
     app = create_app(TestingConfig)
     context = app.app_context()
     context.push()
+    db.drop_all()
     db.create_all()
     
     yield app
