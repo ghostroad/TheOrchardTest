@@ -10,7 +10,7 @@ class Establishment(db.Model):
     zipcode = db.Column(db.String())
     phone = db.Column(db.String())
     cuisine = db.Column(db.String(), index=True)
-    ratings = db.relationship('Rating', backref='establishment', lazy='dynamic')
+    ratings = db.relationship('Rating', lazy='dynamic')
     
     def __repr__(self):
         return '<Establishment - camis: {}, name: {}>'.format(self.camis, self.dba)
@@ -25,4 +25,13 @@ class Rating(db.Model):
     
     def __repr__(self):
         return '<Rating - camis: {}, date: {}, grade: {}>'.format(self.camis, self.date, self.grade)
-    
+
+ratings_partition = db.select([Rating, db.func.row_number().over(order_by=Rating.date.desc(), partition_by=Rating.camis).label('index')]).alias()
+
+LatestRating = db.aliased(Rating, ratings_partition)
+
+Establishment.latest_rating = db.relationship(
+    LatestRating, 
+    primaryjoin=db.and_(LatestRating.camis == Establishment.camis, ratings_partition.c.index == 1),
+    uselist=False
+)
