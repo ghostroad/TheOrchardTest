@@ -1,5 +1,5 @@
 import pytest
-from app.models import Establishment, Rating
+from app.models import Establishment, Rating, LatestRating
 from sqlalchemy import exc, or_, orm, text
 from datetime import date
 
@@ -47,8 +47,8 @@ def test_filtering_by_latest_rating(test_db):
     test_db.add_all([poor, okay, excellent])
     test_db.commit()
 
-    okay_establishments = Establishment.query.options(orm.joinedload(Establishment.latest_rating, innerjoin=True)).filter(
-        or_(text("grade='B'"),  text("grade='A'"), Establishment.cuisine == "French")
+    okay_establishments = Establishment.query.join(Establishment.latest_rating).options(orm.contains_eager(Establishment.latest_rating, alias=LatestRating)).filter(
+        or_(Establishment.cuisine == "French", LatestRating.grade=="B", LatestRating.grade=="A")
     ).all()
 
     assert(set(okay_establishments) == {okay, excellent})
