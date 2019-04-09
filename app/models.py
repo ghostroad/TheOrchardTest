@@ -26,12 +26,12 @@ class Rating(db.Model):
     def __repr__(self):
         return '<Rating - camis: {}, date: {}, grade: {}>'.format(self.camis, self.date, self.grade)
 
-ratings_partition = db.select([Rating, db.func.row_number().over(order_by=Rating.date.desc(), partition_by=Rating.camis).label('index')]).alias()
+ratings_partition = db.select([Rating]).distinct(Rating.camis).order_by(Rating.camis, Rating.date.desc()).alias()
 
 LatestRating = db.aliased(Rating, ratings_partition)
 
 Establishment.latest_rating = db.relationship(
     LatestRating, 
-    primaryjoin=db.and_(LatestRating.camis == Establishment.camis, ratings_partition.c.index == 1),
+    primaryjoin=db.and_(LatestRating.camis == Establishment.camis),
     uselist=False
 )

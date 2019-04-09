@@ -8,6 +8,7 @@ class TestingConfig(object):
     SQLALCHEMY_TRACK_MODIFICATIONS = False    
     TESTING = True
     SQLALCHEMY_DATABASE_URI = "postgresql://localhost/theorchard_test"
+    SQLALCHEMY_ECHO = True
     
 def reset_db():    
     db.session.rollback()
