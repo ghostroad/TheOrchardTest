@@ -1,6 +1,6 @@
-from app import create_app, db
-from app.models import Establishment
-from app.repositories import EstablishmentRepository
+from sietsema import create_app, db
+from sietsema.models import Establishment
+from sietsema.repositories import EstablishmentRepository
 import pytest
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy

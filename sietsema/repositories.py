@@ -1,4 +1,4 @@
-from app.models import Establishment, Rating, LatestRating
+from sietsema.models import Establishment, Rating, LatestRating
 from sqlalchemy import orm
 
 class EstablishmentRepository(object):

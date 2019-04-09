@@ -1,5 +1,5 @@
 import pytest
-from app.models import Establishment, Rating
+from sietsema.models import Establishment, Rating
 from sqlalchemy import exc
 
 def test_creation(repo):

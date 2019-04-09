@@ -1,4 +1,4 @@
-from app import db
+from sietsema import db
 from sqlalchemy.dialects.postgresql import ENUM
 
 class Establishment(db.Model):
