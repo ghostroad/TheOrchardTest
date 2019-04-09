@@ -26,9 +26,9 @@ class Rating(db.Model):
     def __repr__(self):
         return '<Rating - camis: {}, date: {}, grade: {}>'.format(self.camis, self.date, self.grade)
 
-ratings_partition = db.select([Rating]).distinct(Rating.camis).order_by(Rating.camis, Rating.date.desc()).alias()
+latest_ratings_view = db.select([Rating]).distinct(Rating.camis).order_by(Rating.camis, Rating.date.desc()).alias()
 
-LatestRating = db.aliased(Rating, ratings_partition)
+LatestRating = db.aliased(Rating, latest_ratings_view)
 
 Establishment.latest_rating = db.relationship(
     LatestRating, 

@@ -1,5 +1,5 @@
 import pytest
-from app.models import Establishment, Rating, LatestRating, ratings_partition
+from app.models import Establishment, Rating
 from sqlalchemy import exc, or_, orm, text
 from datetime import date
 
@@ -33,13 +33,13 @@ def test_filtering_by_latest_rating(test_db):
         Rating(grade="C", date="06/15/18"),
     ])
 
-    okay = Establishment(camis=1234, dba="Brasserie Beaubien", ratings=[
+    okay = Establishment(camis=1234, dba="Brasserie Beaubien", cuisine="French", ratings=[
         Rating(grade="A", date="01/02/19"),
         Rating(grade="B", date="03/02/19"),
         Rating(grade="C", date="02/02/19")
     ])
     
-    excellent = Establishment(camis=7654, dba="Trou de Beigne", ratings=[
+    excellent = Establishment(camis=7654, dba="Trou de Beigne", cuisine="French", ratings=[
         Rating(grade="A", date="04/02/19"),
         Rating(grade="C", date="02/02/19")
     ])
@@ -47,6 +47,9 @@ def test_filtering_by_latest_rating(test_db):
     test_db.add_all([poor, okay, excellent])
     test_db.commit()
 
-    okay_establishments = Establishment.query.options(orm.joinedload(Establishment.latest_rating, innerjoin=True)).filter(text("grade='B' or grade='A'")).all()
+    okay_establishments = Establishment.query.options(orm.joinedload(Establishment.latest_rating, innerjoin=True)).filter(
+        or_(text("grade='B'"),  text("grade='A'"), Establishment.cuisine == "French")
+    ).all()
 
-    assert(len(okay_establishments) == 2)
+    assert(set(okay_establishments) == {okay, excellent})
+    assert(set(establishment.latest_rating.grade for establishment in okay_establishments) == {"A", "B"})
