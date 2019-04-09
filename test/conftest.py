@@ -8,8 +8,8 @@ from flask_sqlalchemy import SQLAlchemy
 class TestingConfig(object):
     SQLALCHEMY_TRACK_MODIFICATIONS = False    
     TESTING = True
-    SQLALCHEMY_DATABASE_URI = "postgresql://localhost/theorchard_test"
-    # SQLALCHEMY_ECHO = True
+    SQLALCHEMY_DATABASE_URI = "postgresql://localhost/sietsema_test"
+    SQLALCHEMY_ECHO = False # set to True to log all SQL statements
     
 def reset_db():    
     db.session.rollback() # needed in case the session is in a bad state

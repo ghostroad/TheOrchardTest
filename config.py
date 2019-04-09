@@ -13,5 +13,5 @@ class ProductionConfig(Config):
 class DevelopmentConfig(Config):
     DEVELOPMENT = True
     DEBUG = True
-    SQLALCHEMY_DATABASE_URI = "postgresql://localhost/theorchard"
+    SQLALCHEMY_DATABASE_URI = "postgresql://localhost/sietsema"
 
