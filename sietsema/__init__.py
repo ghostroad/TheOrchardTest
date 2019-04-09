@@ -17,4 +17,4 @@ app = create_app()
     
 migrate = Migrate(app, db)
 
-from app import routes, models
+from sietsema import routes, models

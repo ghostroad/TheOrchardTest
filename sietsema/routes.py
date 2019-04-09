@@ -1,5 +1,5 @@
-from app import app
-from app.models import Establishment
+from sietsema import app
+from sietsema.models import Establishment
 
 @app.route('/')
 @app.route('/index')
