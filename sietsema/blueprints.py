@@ -1,4 +1,4 @@
-from flask import Blueprint, request
+from flask import Blueprint, request, jsonify
 from sietsema.models import Establishment
 from sietsema import db
 
@@ -8,9 +8,9 @@ write_api = Blueprint('write_api', __name__)
 def health():
     return "Alive!"    
 
-@app.route('/establishment/<int:camis>', methods=['PUT'])
+@write_api.route('/establishment/<int:camis>', methods=['PUT'])
 def establishment(camis):
-    data = flask.request.get_json()
-    db.session.add(Establishment(data))
+    data = request.get_json()
+    db.session.add(Establishment(camis=camis, **data))
     db.session.commit()
-    return 200
+    return jsonify(success=True)
