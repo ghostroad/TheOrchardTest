@@ -40,14 +40,18 @@ def ratings(camis):
         return (jsonify(message=" ".join(errors)), 400)
     
     establishment = establishment_repo.find(camis)
-    if establishment:
+    
+    if not establishment: return (jsonify(message="No establishment with that camis exists."), 400)
+    
+    rating = establishment.ratings.filter_by(date=input['date']).all()
+    if rating:
+        return (jsonify(message="A rating already exists for that date."), 400)
+    else:
         establishment.ratings.append(Rating(camis=camis, **input))
         db.session.commit()
         return jsonify(message="Created new rating.")
-    else:
-        return (jsonify(message="No establishment with that camis exists."), 400)
-    
         
+
 def update_establishment(establishment, input):
     new_inspection_date = ('inspection_date' in input) and parse(input['inspection_date']).date()
     if (new_inspection_date and ((establishment.inspection_date is None) or (establishment.inspection_date < new_inspection_date))):
