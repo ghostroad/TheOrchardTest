@@ -11,7 +11,7 @@ class TestingConfig(object):
     SQLALCHEMY_DATABASE_URI = "postgresql://localhost/sietsema_test"
     SQLALCHEMY_ECHO = False # set to True to log all SQL statements
     
-def reset_db():    
+def reset_db():
     db.session.rollback() # needed in case the session is in a bad state
     db.session.execute("TRUNCATE TABLE establishment CASCADE")
     db.session.commit()

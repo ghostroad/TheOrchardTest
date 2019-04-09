@@ -1,10 +1,12 @@
 from flask import Blueprint, request, jsonify
-from sietsema.models import Establishment
+from sietsema.models import Establishment, Rating
+from sietsema.repositories import EstablishmentRepository
 from sietsema import db
-from sietsema.validations import validate, validate_date
+from sietsema.validations import validate, validate_date, validate_grade
 from dateutil.parser import parse
 
 write_api = Blueprint('write_api', __name__)
+establishment_repo = EstablishmentRepository(db.session)
 
 @write_api.route('/health')
 def health():
@@ -20,13 +22,31 @@ def establishment(camis):
     if errors:
         return (jsonify(message=" ".join(errors)), 400)
 
-    existing = Establishment.query.get(camis)
+    existing = establishment_repo.find(camis)
     if existing:
         return update_establishment(existing, input)
     else:
-        db.session.add(Establishment(camis=camis, **input))
-        db.session.commit()
+        establishment_repo.save(Establishment(camis=camis, **input))
         return jsonify(message="Created new establishment.")
+        
+        
+@write_api.route('/establishments/<int:camis>/ratings', methods=['POST'])
+def ratings(camis):
+    input = request.get_json()
+    errors = validate(input, 
+                valid_keys=['grade', 'date'], required_keys=['grade', 'date'], validations={'date': validate_date, 'grade': validate_grade})
+    
+    if errors:
+        return (jsonify(message=" ".join(errors)), 400)
+    
+    establishment = establishment_repo.find(camis)
+    if establishment:
+        establishment.ratings.append(Rating(camis=camis, **input))
+        db.session.commit()
+        return jsonify(message="Created new rating.")
+    else:
+        return (jsonify(message="No establishment with that camis exists."), 400)
+    
         
 def update_establishment(establishment, input):
     new_inspection_date = ('inspection_date' in input) and parse(input['inspection_date']).date()
