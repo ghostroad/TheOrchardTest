@@ -5,8 +5,8 @@ from urllib.parse import urljoin
 from uuid import uuid4
 import logging
 
-# A slightly more abstract version of the relevant data contained in each row
-# of the CSV file
+# An abstract version of the relevant data contained in each row
+# of the CSV file. Gets rid of columns we don't need.
 class DataRow(object):
     def __init__(self, camis, establishment_data, rating_data):
         self.camis = camis
@@ -35,7 +35,8 @@ class CSVDataRowStream(object):
                 yield DataRow(camis=camis, establishment_data=establishment_data, rating_data=rating_data)
 
 
- 
+# Handles sending establishment and rating data to an http destination.
+# Reports errors if they occur.
 class HttpDestination(object):
     def __init__(self, service_url):
         self.service_url = service_url
@@ -43,17 +44,15 @@ class HttpDestination(object):
     def _handle_response(self, response, camis, data, error_reporter):
         if response.status_code == 400:
             error_reporter.error("camis: {}, data: {}, message: {}".format(camis, data, response.json()))
-            return False
-        else:
-            return True
         
     def send_establishment_data(self, camis, data, error_reporter):
-        return self._handle_response(requests.put(urljoin(self.service_url, "establishments/{}".format(camis)), json=data), camis, data, error_reporter)
+        self._handle_response(requests.put(urljoin(self.service_url, "establishments/{}".format(camis)), json=data), camis, data, error_reporter)
     
     def send_rating_data(self, camis, data, error_reporter):
-        return self._handle_response(requests.post(urljoin(self.service_url, "establishments/{}/ratings".format(camis)), json=data), camis, data, error_reporter)
+        self._handle_response(requests.post(urljoin(self.service_url, "establishments/{}/ratings".format(camis)), json=data), camis, data, error_reporter)
 
-
+# Contains the core logic of the import process.
+# Gets rid of rows that we don't need.
 class ImportJob(object):
     def __init__(self, datarow_stream, destination, log_handler):
         self.datarow_stream = datarow_stream
@@ -71,10 +70,10 @@ class ImportJob(object):
         self.logger.info(message)
     
     def _process(self, datarow):
-        if not datarow.establishment_data['dba']: return
-        if not self.destination.send_establishment_data(datarow.camis, datarow.establishment_data, self): return
-        if not datarow.rating_data['grade'] in ['A', 'B', 'C']: return
-        self.destination.send_rating_data(datarow.camis, datarow.rating_data, self)
+        if datarow.establishment_data['dba']: 
+            self.destination.send_establishment_data(datarow.camis, datarow.establishment_data, self)
+        if datarow.rating_data['grade'] in ['A', 'B', 'C']:
+            self.destination.send_rating_data(datarow.camis, datarow.rating_data, self)
         
     def run(self):
         for datarow in self.datarow_stream.run():
