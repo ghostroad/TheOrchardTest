@@ -1,6 +1,7 @@
 from sietsema import db
 from sqlalchemy.dialects.postgresql import ENUM
 
+
 class Establishment(db.Model):
     camis = db.Column(db.Integer, primary_key=True)
     dba = db.Column(db.String(), nullable=False)
@@ -15,7 +16,8 @@ class Establishment(db.Model):
     
     def __repr__(self):
         return '<Establishment - camis: {}, name: {}>'.format(self.camis, self.dba)
-        
+
+
 class Rating(db.Model):
     
     id = db.Column(db.Integer, primary_key=True)
@@ -26,6 +28,7 @@ class Rating(db.Model):
     
     def __repr__(self):
         return '<Rating - camis: {}, date: {}, grade: {}>'.format(self.camis, self.date, self.grade)
+
 
 latest_ratings_view = db.select([Rating]).distinct(Rating.camis).order_by(Rating.camis, Rating.date.desc()).alias()
 

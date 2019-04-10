@@ -1,6 +1,7 @@
 from scripts.importer import ImportJob, DataRow
 import logging
 
+
 class FakeStream(object):
     def run(self):
         return [
@@ -20,7 +21,8 @@ class FakeDestination(object):
     
     def send_rating_data(self, camis, data, error_reporter):
         self.rating_camises.append(camis)
-            
+
+
 def test_import_job():
     destination = FakeDestination()
     job = ImportJob(FakeStream(), destination, logging.NullHandler())

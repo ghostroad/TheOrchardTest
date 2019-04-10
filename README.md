@@ -36,9 +36,11 @@ type of cuisine, address, and last inspection date.
 A rating for an establishment is a grade of 'A', 'B', or 'C', assigned by an inspector. Ratings are stored in the table `rating`, 
 along with the dates on which they were assigned. 
 
-An establishment may have many ratings or none of them. Because our goal is to filter restaurants by rating, we exclude records in
-the source data that have a pending grade or that have no grade. When we filter establishments based on a minimum grade, we do so using
-the *most recent* grade they have received. 
+An establishment may have many ratings or none of them. Because our goal is to search for restaurants by rating, when we ingest data, we exclude records in the source that have a pending grade or that have no grade. 
+
+Although we store all the grades a restaurant has received, when filtering restaurants by minimum grade, we do so on the basis of the *most recent* grade they have each received.
+
+### Table structures
 
 `establishment`:
 

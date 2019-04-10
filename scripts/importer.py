@@ -1,59 +1,68 @@
 import argparse
 import requests
-import csv 
+import csv
 from urllib.parse import urljoin
 from uuid import uuid4
 import logging
 
-# An abstract version of the relevant data contained in each row
-# of the CSV file. Gets rid of columns we don't need.
+
 class DataRow(object):
+    """An abstract version of the relevant data contained in each row
+    of the CSV file. Gets rid of columns we don't need."""
+
     def __init__(self, camis, establishment_data, rating_data):
         self.camis = camis
         self.establishment_data = establishment_data
         self.rating_data = rating_data
 
-# Encapsulates knowledge about the source and format, yields a stream
-# of DataRows
+
 class CSVDataRowStream(object):
+    """Encapsulates knowledge about the source and format, yields a stream
+    of DataRows"""
+
     def __init__(self, source_file):
         self.source_file = source_file
-    
+
     def run(self):
-        with open(args.source_file) as csvfile:
+        with open(self.source_file) as csvfile:
             reader = csv.DictReader(csvfile)
             for row in reader:
                 camis = row['CAMIS']
                 establishment_data = dict(
-                    dba=row['DBA'], boro=row['BORO'], building=row['BUILDING'], street=row['STREET'], 
-                    zipcode=row['ZIPCODE'], phone=row['PHONE'], cuisine=row['CUISINE DESCRIPTION'], 
+                    dba=row['DBA'], boro=row['BORO'], building=row['BUILDING'], street=row['STREET'],
+                    zipcode=row['ZIPCODE'], phone=row['PHONE'], cuisine=row['CUISINE DESCRIPTION'],
                     inspection_date=row['INSPECTION DATE']
                 )
-        
+
                 rating_data = dict(grade=row['GRADE'], date=row['GRADE DATE'])
-                
+
                 yield DataRow(camis=camis, establishment_data=establishment_data, rating_data=rating_data)
 
 
-# Handles sending establishment and rating data to an http destination.
-# Reports errors if they occur.
 class HttpDestination(object):
+    """Handles sending establishment and rating data to an http destination.
+    Reports errors if they occur."""
+
     def __init__(self, service_url):
         self.service_url = service_url
-    
+
     def _handle_response(self, response, camis, data, error_reporter):
         if response.status_code == 400:
             error_reporter.error("camis: {}, data: {}, message: {}".format(camis, data, response.json()))
-        
-    def send_establishment_data(self, camis, data, error_reporter):
-        self._handle_response(requests.put(urljoin(self.service_url, "establishments/{}".format(camis)), json=data), camis, data, error_reporter)
-    
-    def send_rating_data(self, camis, data, error_reporter):
-        self._handle_response(requests.post(urljoin(self.service_url, "establishments/{}/ratings".format(camis)), json=data), camis, data, error_reporter)
 
-# Contains the core logic of the import process.
-# Gets rid of rows that we don't need.
+    def send_establishment_data(self, camis, data, error_reporter):
+        self._handle_response(requests.put(urljoin(self.service_url, "establishments/{}".format(camis)), json=data),
+                              camis, data, error_reporter)
+
+    def send_rating_data(self, camis, data, error_reporter):
+        self._handle_response(requests.post(urljoin(self.service_url, "establishments/{}/ratings".format(camis)),
+                                            json=data), camis, data, error_reporter)
+
+
 class ImportJob(object):
+    """Contains the core logic of the import process.
+    Gets rid of rows that we don't need."""
+
     def __init__(self, datarow_stream, destination, log_handler):
         self.datarow_stream = datarow_stream
         self.destination = destination
@@ -62,34 +71,35 @@ class ImportJob(object):
         self.logger = logging.getLogger("Import job {}".format(self.id))
         self.logger.setLevel(logging.INFO)
         self.logger.addHandler(log_handler)
-        
+
     def error(self, message):
         self.logger.error(message)
-    
+
     def info(self, message):
         self.logger.info(message)
-    
+
     def _process(self, datarow):
-        if datarow.establishment_data['dba']: 
+        if datarow.establishment_data['dba']:
             self.destination.send_establishment_data(datarow.camis, datarow.establishment_data, self)
         if datarow.rating_data['grade'] in ['A', 'B', 'C']:
             self.destination.send_rating_data(datarow.camis, datarow.rating_data, self)
-        
+
     def run(self):
         for datarow in self.datarow_stream.run():
             self._process(datarow)
             self.rows_processed += 1
-            if self.rows_processed % 500 == 0: self.info("Processed {} rows.".format(self.rows_processed))
-                    
+            if self.rows_processed % 500 == 0:
+                self.info("Processed {} rows.".format(self.rows_processed))
+
+
 if __name__ == '__main__':
-    
     parser = argparse.ArgumentParser(description='Import restaurant rating data.')
     parser.add_argument('-b', dest='base_url', help='The base url for the service.', required=True)
     parser.add_argument('source_file')
 
     args = parser.parse_args()
     base_url = args.base_url
-    
+
     logging_handler = logging.StreamHandler()
     logging_handler.setFormatter(logging.Formatter('%(name)s - %(levelname)s - %(message)s'))
 

@@ -1,9 +1,8 @@
-from sietsema import create_app, db
-from sietsema.models import Establishment
-from sietsema.repositories import EstablishmentRepository
 import pytest
-from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
+
+from sietsema import create_app, db
+from sietsema.repositories import EstablishmentRepository
+
 
 class TestingConfig(object):
     SQLALCHEMY_TRACK_MODIFICATIONS = False    
