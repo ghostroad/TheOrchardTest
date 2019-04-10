@@ -3,8 +3,15 @@
 This service, codenamed `Sietsema`[*](#footnote) , manages and serves data extracted from 
 [the NYC Department of Health & Mental Hygiene Restaurant Inspection Results Dataset](https://data.cityofnewyork.us/Health/DOHMH-New-York-City-Restaurant-Inspection-Results/43nn-pn8j).
 
-It is hosted [here](https://sietsema.herokuapp.com). It has no UI component, but exposes an [API](#read-api) that can be queried
+It is hosted [here](https://sietsema.herokuapp.com). It has no UI component, but exposes an API that can be queried
 using an http client like `curl` or Paw.
+
+An example query using `curl` (see [below](#read-api) for an explanation):
+
+```
+curl "https://sietsema.herokuapp.com/search?min_grade=B&limit=5&cuisine=Thai&after=40799210"
+```
+
 
 ## Installation
 
