@@ -18,3 +18,10 @@ def validate_date(input):
 
 def validate_grade(input):
     return [] if input in ['A', 'B', 'C'] else ["The grade must be A, B, or C."]
+    
+def validate_int(input):
+    try:
+        int(input)
+        return []
+    except ValueError:
+        return ["Failed to parse as integer."]

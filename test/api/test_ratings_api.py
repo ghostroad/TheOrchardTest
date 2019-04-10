@@ -35,7 +35,7 @@ def test_creating_a_rating_fails_if_there_is_one_for_that_date(test_client, repo
     test_client.post('/establishments/1234/ratings', json={'grade': 'A', 'date': '02/10/2019'})
     
     response = test_client.post('/establishments/1234/ratings', json={'grade': 'B', 'date': '02/10/2019'})
-    assert response.status_code == 400
+    assert response.status_code == 403
     
     assert "A rating already exists for that date." in response.get_json()['message']
         
