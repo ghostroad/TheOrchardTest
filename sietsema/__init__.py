@@ -3,9 +3,10 @@ log = logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)
 
 from flask import Flask
-from config import DevelopmentConfig
+from config import Config
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
+import os
 
 db = SQLAlchemy()
 
@@ -14,12 +15,15 @@ from sietsema.blueprints.write import write_api
 
 def create_app(test_config = None):
     app = Flask(__name__, instance_relative_config=True)
-    app.config.from_object(DevelopmentConfig)
+    app.config.from_object(Config)
+    if 'SIETSEMA_SETTINGS' in os.environ:
+        app.config.from_envvar('SIETSEMA_SETTINGS')
+    if test_config:
+        app.config.from_object(test_config)
+        
     app.register_blueprint(write_api)
     app.register_blueprint(read_api)
     
-    if test_config:
-        app.config.from_object(test_config)
     db.init_app(app)
     return app
     
