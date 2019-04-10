@@ -21,7 +21,6 @@ pytest==4.4.0
 python-dateutil==2.8.0
 python-editor==1.0.4
 requests==2.21.0
--e git+git@github.com:ghostroad/TheOrchardTest.git@51c273a573345e669c2d2d893e65b192e52bcea4#egg=sietsema
 six==1.12.0
 SQLAlchemy==1.3.2
 urllib3==1.24.1
