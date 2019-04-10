@@ -63,7 +63,7 @@ along with the dates on which they were assigned.
 
 ## Write API
 
-#### Create/Update Establishment
+### Create/Update Establishment
 
 `PUT /establishments/<camis>` with a JSON request body of the form:
 
@@ -90,7 +90,7 @@ Responses:
 the information in the request is stale.
 - `400` if the inputs are invalid.
 
-#### Create Rating
+### Create Rating
 
 `POST /establishments/<camis>/ratings` with a JSON request body of the form:
 
@@ -111,7 +111,7 @@ Responses:
 
 ## Read API
 
-#### Search for restaurants
+### Search for restaurants
 
 `GET /search` with the following query parameters:
 - `cuisine` (string, optional): filters the results by the specified cuisine
@@ -120,7 +120,7 @@ is below the one specified.
 - `after` (integer, optional): restricts to establishments that have a `camis` greater than this parameter, used for paginating through results.
 - `limit` (integer, optional, defaults to 20): limits the number of entries returned.
 
-##### Example
+#### Example
 
 Request: `GET /search?cuisine=Polish&min_grade=B&limit=3&after=40561312`
 
