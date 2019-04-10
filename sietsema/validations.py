@@ -21,7 +21,7 @@ def validate_grade(input):
     
 def validate_int(input):
     try:
-        int(input)
-        return []
+        i = int(input)
+        return [] if i >= 0 else ["Must be nonnegative."]
     except ValueError:
         return ["Failed to parse as integer."]
