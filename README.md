@@ -15,8 +15,7 @@ curl "https://sietsema.herokuapp.com/search?min_grade=B&limit=5&cuisine=Thai&aft
 
 ## Installation
 
-The service is written in Python 3 and requires a Postgres database. After cloning, perform the following steps to install it locally for development purposes (all within 
-the base repository folder):
+The service is written in Python 3 and requires a Postgres database. After cloning, perform the following steps to install it locally for development purposes:
 - (Optionally) Create a virtual environment, using `conda` or `virtualenv`.
 - Install the dependencies: ```pip install -r requirements.txt```.
 - Export as environment variables: `FLASK_APP=sietsema.py` and `FLASK_ENV=development`.
@@ -25,7 +24,12 @@ the base repository folder):
 - Start the server: `flask run`.
 - Run tests: `pytest -v`.
 
-Data can be imported into the service from a CSV file using `scripts/importer.py`. Running it provides helpful usage information. 
+Data can be imported into the service from a CSV file using `scripts/importer.py`. Running it provides usage information. As an example,
+if I have the server running at `http://localhost:5000`, and a CSV file `DOHMH_New_York_City_Restaurant_Inspection_Results.csv`, containing data I'd like to import, I can do so by running
+
+```
+python importer.py -b http://localhost:5000 DOHMH_New_York_City_Restaurant_Inspection_Results.csv
+```  
 
 ## Database structure
 
@@ -128,6 +132,8 @@ Responses:
 is below the one specified.
 - `after` (integer, optional): restricts to establishments that have a `camis` greater than this parameter, used for paginating through results.
 - `limit` (integer, optional, defaults to 20): limits the number of entries returned.
+
+*Note*: When determining whether an establishment satisfies the minimum grade requirement, we only look at its latest grade (although we store all the grades it has received).
 
 #### Example
 
