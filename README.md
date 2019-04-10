@@ -20,9 +20,10 @@ the base repository folder):
 - (Optionally) Create a virtual environment, using `conda` or `virtualenv`.
 - Install the dependencies: ```pip install -r requirements.txt```.
 - Export as environment variables: `FLASK_APP=sietsema.py` and `FLASK_ENV=development`.
-- Create postgres databases `sietsema` and `sietsema_test`.
+- Create Postgres databases `sietsema` and `sietsema_test`.
 - Migrate the development database: `flask db upgrade`.
 - Start the server: `flask run`.
+- Run tests: `pytest -v`.
 
 ## Database structure
 
@@ -32,6 +33,10 @@ type of cuisine, address, and last inspection date.
 
 A rating for an establishment is a grade of 'A', 'B', or 'C', assigned by an inspector. Ratings are stored in the table `rating`, 
 along with the dates on which they were assigned. 
+
+An establishment may have many ratings or none of them. Because our goal is to filter restaurants by rating, we exclude records in
+the source data that have a pending grade or that have no grade. When we filter establishments based on a minimum grade, we do so using
+the *most recent* grade they have received. 
 
 `establishment`:
 
